@@ -33,11 +33,13 @@
             this.btnOpenList = new System.Windows.Forms.Button();
             this.txtFolderDelete = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnDeleteFile = new System.Windows.Forms.Button();
+            this.btnDeleteFileInList = new System.Windows.Forms.Button();
             this.lbstatus = new System.Windows.Forms.Label();
             this.btnExtractLink = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.txtKeywordFinder = new System.Windows.Forms.TextBox();
+            this.btnFilterLink = new System.Windows.Forms.Button();
+            this.btnDeleteFileWithOutList = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtInputList
@@ -52,9 +54,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(23, 26);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(124, 13);
+            this.label1.Size = new System.Drawing.Size(91, 13);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Danh Sách File Cần Xóa";
+            this.label1.Text = "List Link Đầu Vào";
             // 
             // btnOpenList
             // 
@@ -82,15 +84,15 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "Thư Mục File Cần Xóa";
             // 
-            // btnDeleteFile
+            // btnDeleteFileInList
             // 
-            this.btnDeleteFile.Location = new System.Drawing.Point(25, 130);
-            this.btnDeleteFile.Name = "btnDeleteFile";
-            this.btnDeleteFile.Size = new System.Drawing.Size(525, 23);
-            this.btnDeleteFile.TabIndex = 5;
-            this.btnDeleteFile.Text = "DeleteFile";
-            this.btnDeleteFile.UseVisualStyleBackColor = true;
-            this.btnDeleteFile.Click += new System.EventHandler(this.btnDeleteFile_Click);
+            this.btnDeleteFileInList.Location = new System.Drawing.Point(25, 130);
+            this.btnDeleteFileInList.Name = "btnDeleteFileInList";
+            this.btnDeleteFileInList.Size = new System.Drawing.Size(227, 23);
+            this.btnDeleteFileInList.TabIndex = 5;
+            this.btnDeleteFileInList.Text = "Xóa File Theo List";
+            this.btnDeleteFileInList.UseVisualStyleBackColor = true;
+            this.btnDeleteFileInList.Click += new System.EventHandler(this.btnDeleteFile_Click);
             // 
             // lbstatus
             // 
@@ -127,16 +129,38 @@
             this.txtKeywordFinder.Size = new System.Drawing.Size(296, 20);
             this.txtKeywordFinder.TabIndex = 8;
             // 
+            // btnFilterLink
+            // 
+            this.btnFilterLink.Location = new System.Drawing.Point(25, 251);
+            this.btnFilterLink.Name = "btnFilterLink";
+            this.btnFilterLink.Size = new System.Drawing.Size(525, 23);
+            this.btnFilterLink.TabIndex = 10;
+            this.btnFilterLink.Text = "Lọc Link Trùng Lặp";
+            this.btnFilterLink.UseVisualStyleBackColor = true;
+            this.btnFilterLink.Click += new System.EventHandler(this.btnFilterLink_Click);
+            // 
+            // btnDeleteFileWithOutList
+            // 
+            this.btnDeleteFileWithOutList.Location = new System.Drawing.Point(310, 130);
+            this.btnDeleteFileWithOutList.Name = "btnDeleteFileWithOutList";
+            this.btnDeleteFileWithOutList.Size = new System.Drawing.Size(227, 23);
+            this.btnDeleteFileWithOutList.TabIndex = 11;
+            this.btnDeleteFileWithOutList.Text = "Xóa File Khác List";
+            this.btnDeleteFileWithOutList.UseVisualStyleBackColor = true;
+            this.btnDeleteFileWithOutList.Click += new System.EventHandler(this.btnDeleteFileWithOutList_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(583, 243);
+            this.ClientSize = new System.Drawing.Size(583, 310);
+            this.Controls.Add(this.btnDeleteFileWithOutList);
+            this.Controls.Add(this.btnFilterLink);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtKeywordFinder);
             this.Controls.Add(this.btnExtractLink);
             this.Controls.Add(this.lbstatus);
-            this.Controls.Add(this.btnDeleteFile);
+            this.Controls.Add(this.btnDeleteFileInList);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtFolderDelete);
             this.Controls.Add(this.btnOpenList);
@@ -156,11 +180,13 @@
         private System.Windows.Forms.Button btnOpenList;
         private System.Windows.Forms.TextBox txtFolderDelete;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnDeleteFile;
+        private System.Windows.Forms.Button btnDeleteFileInList;
         private System.Windows.Forms.Label lbstatus;
         private System.Windows.Forms.Button btnExtractLink;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtKeywordFinder;
+        private System.Windows.Forms.Button btnFilterLink;
+        private System.Windows.Forms.Button btnDeleteFileWithOutList;
     }
 }
 

@@ -21,6 +21,45 @@ namespace RemoveFile
         }
 
         public List<string> _listFileDelete = new List<string>();
+
+        public List<string> FilterUniqueLinks(List<string> links)
+        {
+            // Tạo một HashSet để lưu trữ các đường link duy nhất
+            HashSet<string> uniqueLinks = new HashSet<string>();
+
+            // Lặp qua từng đường link trong danh sách và thêm vào HashSet
+            foreach (var link in links)
+            {
+                uniqueLinks.Add(link);
+            }
+
+            // Chuyển đổi HashSet thành List và trả về
+            return uniqueLinks.ToList();
+        }
+        public List<string> ExtractAndFilterUniqueLinks(string fileInput)
+        {
+            List<string> links = new List<string>();
+
+            string text = File.ReadAllText(fileInput);
+
+            // Biểu thức chính quy để tìm các đường link
+            string pattern = @"https?://\S+";
+
+            // Tìm các đường link trong văn bản sử dụng biểu thức chính quy
+            MatchCollection matches = Regex.Matches(text, pattern);
+
+            // Lấy các đường link từ các kết quả tìm được
+            foreach (Match match in matches)
+            {
+                links.Add(match.Value);
+            }
+
+            // Lọc các đường link duy nhất bằng cách chuyển danh sách thành HashSet
+            HashSet<string> uniqueLinks = new HashSet<string>(links);
+
+            // Chuyển đổi HashSet thành List và trả về
+            return uniqueLinks.ToList();
+        }
         public List<string> ReadFileLinesToList(string filePath)
         {
             List<string> lines = new List<string>();
@@ -75,6 +114,37 @@ namespace RemoveFile
                 lbstatus.Text = "Lỗi: " + ex.Message;
             }
         }
+        public void DeleteFilesWithOutListInDirectory(List<string> filesToDelete, string directoryPath)
+        {
+            try
+            {
+                // Kiểm tra xem thư mục tồn tại không
+                if (!Directory.Exists(directoryPath))
+                {
+                    lbstatus.Text = "Thư mục không tồn tại.";
+                    return;
+                }
+
+                // Lặp qua tất cả các tệp trong thư mục
+                foreach (string filePath in Directory.GetFiles(directoryPath))
+                {
+                    // Lấy tên tệp từ đường dẫn
+                    string fileName = Path.GetFileName(filePath);
+
+                    // Nếu tên tệp không nằm trong danh sách cho phép, xóa tệp đó
+                    if (!filesToDelete.Contains(fileName))
+                    {
+                        File.Delete(filePath);
+                        lbstatus.Text = $"Đã xóa tệp !";
+                    }
+                }
+                lbstatus.Text = "Hoàn thành.";
+            }
+            catch (Exception ex)
+            {
+                lbstatus.Text = "Lỗi: " + ex.Message;
+            }
+        }
 
         public List<string> GetLinksFromHtml(string filePath)
         {
@@ -118,58 +188,19 @@ namespace RemoveFile
             HtmlAgilityPack.HtmlDocument htmlDoc = new HtmlAgilityPack.HtmlDocument();
             htmlDoc.Load(htmlFile);
 
-            // Tìm tất cả các thẻ <a> trong HTML
-            HtmlNodeCollection linkNodes = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
+            // Tìm tất cả các thuộc tính trong HTML
+            var linkNodes = htmlDoc.DocumentNode.Descendants()
+                .SelectMany(node => node.Attributes)
+                .Where(attr => attr.Value.StartsWith(keyword))
+                .Select(attr => attr.Value);
 
-            if (linkNodes != null)
+            foreach (var link in linkNodes)
             {
-                foreach (HtmlNode linkNode in linkNodes)
-                {
-                    string href = linkNode.GetAttributeValue("href", "").ToLower();
-
-                    // Kiểm tra xem liên kết có chứa từ khóa được chỉ định không
-                    if (href.Contains(keyword))
-                    {
-                        // Kiểm tra xem đường dẫn là đường dẫn tuyệt đối hay tương đối
-                        if (!Uri.IsWellFormedUriString(href, UriKind.Absolute))
-                        {
-                            // Nếu đường dẫn không phải là đường dẫn tuyệt đối, thì chuyển đổi nó thành đường dẫn tuyệt đối
-                            Uri baseUri = new Uri(htmlFile, UriKind.RelativeOrAbsolute);
-                            href = new Uri(baseUri, href).AbsoluteUri;
-                        }
-                        links.Add(href);
-                    }
-                }
+                links.Add(link);
             }
-
             return links;
         }
 
-        public List<string> FindLinksByPartialUrl(string htmlFile, string partialUrl)
-        {
-            List<string> links = new List<string>();
-
-            // Đọc toàn bộ nội dung của tệp HTML
-            string htmlContent = File.ReadAllText(htmlFile);
-
-            // Tìm các đường link trong nội dung HTML bằng biểu thức chính quy
-            Regex regex = new Regex(@"<a\s+(?:[^>]*?\s+)?href=([""'])(.*?)\1", RegexOptions.IgnoreCase);
-            MatchCollection matches = regex.Matches(htmlContent);
-
-            // Lặp qua các kết quả tìm thấy
-            foreach (Match match in matches)
-            {
-                string href = match.Groups[2].Value;
-
-                // Kiểm tra nếu đường link chứa phần của đường link được chỉ định
-                if (href.Contains(partialUrl))
-                {
-                    links.Add(href);
-                }
-            }
-
-            return links;
-        }
 
         public void SaveListToFile(List<string> list, string filePath)
         {
@@ -212,8 +243,23 @@ namespace RemoveFile
             }
             else
             {
+                _listFileDelete = new List<string>();
                 _listFileDelete = ReadFileLinesToList(txtInputList.Text);
                 DeleteFilesInDirectory(_listFileDelete, txtFolderDelete.Text);
+            }
+        }
+
+        private void btnDeleteFileWithOutList_Click(object sender, EventArgs e)
+        {
+            if (!Directory.Exists(txtFolderDelete.Text))
+            {
+                MessageBox.Show(" Thư mục không tồn tại ");
+            }
+            else
+            {
+                _listFileDelete = new List<string>();
+                _listFileDelete = ReadFileLinesToList(txtInputList.Text);
+                DeleteFilesWithOutListInDirectory(_listFileDelete, txtFolderDelete.Text);
             }
         }
 
@@ -225,9 +271,25 @@ namespace RemoveFile
             }
             else
             {
-                var listlink = FindLinksByPartialUrl(txtInputList.Text,txtKeywordFinder.Text);
-                SaveListToFile(listlink, txtFolderDelete.Text + "\\savelink.txt");
+                var listlink = GetLinksContainingKeyword(txtInputList.Text,txtKeywordFinder.Text);
+                SaveListToFile(listlink, txtFolderDelete.Text + "\\ExtractLinks.txt");
             }
         }
+
+        private void btnFilterLink_Click(object sender, EventArgs e)
+        {
+            if (!Directory.Exists(txtFolderDelete.Text))
+            {
+                MessageBox.Show(" Thư mục không tồn tại ");
+            }
+            else
+            {
+                _listFileDelete = new List<string>();
+                _listFileDelete = ExtractAndFilterUniqueLinks(txtInputList.Text);
+                SaveListToFile(_listFileDelete, txtFolderDelete.Text + "\\FilterLinks.txt");
+            }
+        }
+
+     
     }
 }
